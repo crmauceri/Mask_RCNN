@@ -21,6 +21,9 @@ RUN python setup.py install
 WORKDIR /app/coco/PythonAPI/
 RUN make
 
+# Specify directories that will be shared with host 
+VOLUME /data
+
 # Define environment variable
 ENV NAME MaskRCNN
 

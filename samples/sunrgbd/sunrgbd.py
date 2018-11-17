@@ -19,12 +19,6 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
 
     # Train a new model starting from ImageNet weights
     python3 sunrgbd.py train --dataset=/path/to/sunrgbd/dataset --weights=imagenet
-
-    # Apply color splash to an image
-    python3 sunrgbd.py splash --weights=/path/to/weights/file.h5 --image=<URL or path to file>
-
-    # Apply color splash to video using the last weights you trained
-    python3 sunrgbd.py splash --weights=last --video=<URL or path to file>
 """
 
 import os

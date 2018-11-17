@@ -11,7 +11,6 @@ WORKDIR /app
 
 # Copy the Mask_RCNN directory contents into the container at /app
 COPY . /app/
-# COPY cocoapi /app/
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
@@ -19,8 +18,8 @@ RUN python setup.py install
     
 
 # Compile cocoapi 
-# WORKDIR /app/cocoapi/PythonAPI
-# RUN make
+WORKDIR /app/coco/PythonAPI/
+RUN make
 
 # Define environment variable
 ENV NAME MaskRCNN

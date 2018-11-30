@@ -4,7 +4,7 @@
 FROM tensorflow/tensorflow:latest-py3
 
 # For GPU use 
-# FROM tensorflow/tensorflow:latest-gpu
+# FROM tensorflow/tensorflow:latest-gpu-py3
 
 # Set the working directory to /app
 WORKDIR /app

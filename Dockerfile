@@ -23,6 +23,6 @@ VOLUME /data
 ENV NAME MaskRCNN
 
 # Expose port for jupyter notebook
-EXPOSE 8888
+# EXPOSE 8888
 
 ENTRYPOINT ["python", "samples/sunrgbd/sunrgbd.py"]

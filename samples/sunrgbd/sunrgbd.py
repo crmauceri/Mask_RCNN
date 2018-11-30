@@ -85,18 +85,14 @@ class SUNRGBDDataset(utils.Dataset):
         subset: Subset to load: train or val
         """
 
-        # Train or validation dataset?
-        assert subset in ["train", "val"]
-        dataset_dir = os.path.join(dataset_dir, subset)
-
         # Load annotations
         # Uses the cocoapi json format
-        annotations = COCO("{}/annotations/instances.json".format(dataset_dir))
+        annotations = COCO("{}/SUNRGBD/instances_{}.json".format(dataset_dir, subset))
 
         # Add classes.
         class_ids = sorted(annotations.getCatIds())
         for cat_idx in class_ids:
-            cat = annotations.loadCats(i)[0]["name"]
+            cat = annotations.loadCats(cat_idx)[0]["name"]
             self.add_class("sunrgbd", cat_idx, cat)
 
         # Add images
@@ -137,8 +133,7 @@ class SUNRGBDDataset(utils.Dataset):
             class_id = self.map_source_class_id(
                 "sunrgbd.{}".format(annotation['category_id']))
             if class_id:
-                m = self.annToMask(annotation, image_info["height"],
-                                   image_info["width"])
+                m = self.annToMask(annotation['segmentation'])
 
                 # Some objects are so small that they're less than 1 pixel area
                 # and end up rounded out. Skip those objects.
@@ -165,17 +160,25 @@ class SUNRGBDDataset(utils.Dataset):
         else:
             super(SUNRGBDDataset, self).image_reference(image_id)
 
+    def annToMask(self, seg):
+        """
+        Convert annotation which is RLE to binary mask.
+        :return: binary mask (numpy 2D array)
+        """
+        m = maskUtils.decode(seg)
+        return m
 
-def train(model):
+
+def train(model, dataset, config=SUNRGBDConfig()):
     """Train the model."""
     # Training dataset.
     dataset_train = SUNRGBDDataset()
-    dataset_train.load_sunrgbd(args.dataset, "train")
+    dataset_train.load_sunrgbd(dataset, "train")
     dataset_train.prepare()
 
     # Validation dataset
     dataset_val = SUNRGBDDataset()
-    dataset_val.load_sunrgbd(args.dataset, "val")
+    dataset_val.load_sunrgbd(dataset, "val")
     dataset_val.prepare()
 
     # *** This training schedule is an example. Update to your needs ***
@@ -270,7 +273,7 @@ if __name__ == '__main__':
 
     # Train or evaluate
     if args.command == "train":
-        train(model)
+        train(model, args.dataset)
     else:
         print("'{}' is not recognized. "
               "Use 'train'".format(args.command))

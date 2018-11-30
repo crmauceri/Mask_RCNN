@@ -1,7 +1,7 @@
 # Use an official tensorflow runtime as a parent image
 
 # For CPU, use
-FROM tensorflow/tensorflow
+FROM tensorflow/tensorflow:latest-py3
 
 # For GPU use 
 # FROM tensorflow/tensorflow:latest-gpu
@@ -13,13 +13,8 @@ WORKDIR /app
 COPY . /app/
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --trusted-host pypi.python.org -r requirements.txt
-RUN python setup.py install
-    
-
-# Compile cocoapi 
-WORKDIR /app/coco/PythonAPI/
-RUN make
+# Compile cocoapi
+RUN ./docker_setup.sh
 
 # Specify directories that will be shared with host 
 VOLUME /data
@@ -27,3 +22,7 @@ VOLUME /data
 # Define environment variable
 ENV NAME MaskRCNN
 
+# Expose port for jupyter notebook
+EXPOSE 8888
+
+CMD ["python", "samples/sunrgbd/sunrgbd.py"]

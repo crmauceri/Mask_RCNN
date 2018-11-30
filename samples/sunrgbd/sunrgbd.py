@@ -87,7 +87,7 @@ class SUNRGBDDataset(utils.Dataset):
 
         # Load annotations
         # Uses the cocoapi json format
-        annotations = COCO("{}/SUNRGBD/instances_{}.json".format(dataset_dir, subset))
+        annotations = COCO("{}/instances_{}.json".format(dataset_dir, subset))
 
         # Add classes.
         class_ids = sorted(annotations.getCatIds())

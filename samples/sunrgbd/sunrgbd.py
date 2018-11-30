@@ -23,10 +23,7 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
 
 import os
 import sys
-import json
-import datetime
 import numpy as np
-import skimage.draw
 
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
@@ -54,14 +51,10 @@ DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
 class SUNRGBDConfig(Config):
     """Configuration for training on the toy  dataset.
-    Derives from the base Config class and overrides some values.
-    """
+        Derives from the base Config class and overrides some values.
+        """
     # Give the configuration a recognizable name
     NAME = "sunrgbd"
-
-    # We use a GPU with 12GB memory, which can fit two images.
-    # Adjust down if you use a smaller GPU.
-    IMAGES_PER_GPU = 2
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 37  # Background + sunrgbd
@@ -169,7 +162,7 @@ class SUNRGBDDataset(utils.Dataset):
         return m
 
 
-def train(model, dataset, config=SUNRGBDConfig()):
+def train(model, dataset, config):
     """Train the model."""
     # Training dataset.
     dataset_train = SUNRGBDDataset()
@@ -213,6 +206,15 @@ if __name__ == '__main__':
                         default=DEFAULT_LOGS_DIR,
                         metavar="/path/to/logs/",
                         help='Logs and checkpoints directory (default=logs/)')
+    parser.add_argument('--numGPUs', required=False,
+                        default=SUNRGBDConfig.GPU_COUNT,
+                        metavar="int",
+                        help='Number of GPUs (default 1)')
+    parser.add_argument('--imagesPerGPU', required=False,
+                        default=SUNRGBDConfig.IMAGES_PER_GPU,
+                        metavar="int",
+                        help='Number of images per GPU (default 2). Adjust based on your GPU memory and image sizes. \
+                            Use the highest number that your GPU can handle for best performance.')
     args = parser.parse_args()
 
     print("Weights: ", args.weights)
@@ -220,6 +222,8 @@ if __name__ == '__main__':
     print("Logs: ", args.logs)
 
     # Configurations
+    SUNRGBDConfig.IMAGES_PER_GPU = args.imagesPerGPU
+    SUNRGBDConfig.GPU_COUNT = args.numGPUs
     config = SUNRGBDConfig()
     config.display()
 
@@ -254,5 +258,5 @@ if __name__ == '__main__':
         model.load_weights(weights_path, by_name=True)
 
     # Train
-    train(model, args.dataset)
+    train(model, args.dataset, config)
 

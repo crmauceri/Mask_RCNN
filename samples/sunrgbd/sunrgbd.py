@@ -202,13 +202,11 @@ if __name__ == '__main__':
     # Parse command line arguments
     parser = argparse.ArgumentParser(
         description='Train Mask R-CNN to detect object segments with depth images.')
-    parser.add_argument("command",
-                        metavar="<command>",
-                        help="'train' or 'splash'")
-    parser.add_argument('--dataset', required=False,
+    parser.add_argument('--dataset', required=True,
                         metavar="/path/to/sunrgbd/dataset/",
                         help='Directory of the SUNRGBD dataset')
-    parser.add_argument('--weights', required=True,
+    parser.add_argument('--weights', required=False,
+                        default='coco',
                         metavar="/path/to/weights.h5",
                         help="Path to weights .h5 file or 'coco'")
     parser.add_argument('--logs', required=False,
@@ -217,32 +215,16 @@ if __name__ == '__main__':
                         help='Logs and checkpoints directory (default=logs/)')
     args = parser.parse_args()
 
-    # Validate arguments
-    if args.command == "train":
-        assert args.dataset, "Argument --dataset is required for training"
-
     print("Weights: ", args.weights)
     print("Dataset: ", args.dataset)
     print("Logs: ", args.logs)
 
     # Configurations
-    if args.command == "train":
-        config = SUNRGBDConfig()
-    else:
-        class InferenceConfig(SUNRGBDConfig):
-            # Set batch size to 1 since we'll be running inference on
-            # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
-            GPU_COUNT = 1
-            IMAGES_PER_GPU = 1
-        config = InferenceConfig()
+    config = SUNRGBDConfig()
     config.display()
 
     # Create model
-    if args.command == "train":
-        model = modellib.MaskRCNN(mode="training", config=config,
-                                  model_dir=args.logs)
-    else:
-        model = modellib.MaskRCNN(mode="inference", config=config,
+    model = modellib.MaskRCNN(mode="training", config=config,
                                   model_dir=args.logs)
 
     # Select weights file to load
@@ -271,9 +253,6 @@ if __name__ == '__main__':
     else:
         model.load_weights(weights_path, by_name=True)
 
-    # Train or evaluate
-    if args.command == "train":
-        train(model, args.dataset)
-    else:
-        print("'{}' is not recognized. "
-              "Use 'train'".format(args.command))
+    # Train
+    train(model, args.dataset)
+

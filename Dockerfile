@@ -25,4 +25,4 @@ ENV NAME MaskRCNN
 # Expose port for jupyter notebook
 EXPOSE 8888
 
-CMD ["python", "samples/sunrgbd/sunrgbd.py"]
+ENTRYPOINT ["python", "samples/sunrgbd/sunrgbd.py"]
